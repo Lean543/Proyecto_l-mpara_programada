@@ -6,6 +6,56 @@
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
 
 
+
+
+
+////////*********///////////////***********/////////////
+
+String ano="",mes="", dia="", hora="",minuto="",segundos="",temperatura="";
+String dia_inicio="",mes_inicia="",dia_termina="",mes_termina="",dia_inicia_flora="",mes_inicia_flora="";
+
+int tiempo=0;
+String fechac="";
+String horac="";
+String datosc="";
+String datosc1="";
+String datosc2="";
+
+//Para la convercion a string 
+///////////////////////
+////////////////////////
+int dia_inicio1 =15 ;         
+int mes_inicia1=1;
+
+int dia_termina1 =dia_inicio1 ;       
+int mes_termina1= mes_inicia1+2;
+
+int dia_inicia_flora1= dia_inicio1;
+int dia_termina_flora1= dia_inicio1;
+
+int mes_inicia_flora1= mes_inicia1+2;
+int mes_termina_flora1=mes_inicia1+4;
+
+
+int segundo1;
+int minuto1;
+int hora1;
+int dia1;
+int mes1;
+///////////////////////
+int boton = 6;
+int estadoBoton;
+
+int M;
+int M2;
+int temp;
+
+
+//////////////*****************/////////////////////*******************//////
+
+
+
+
 /////////////////////////////////////////////////para el menu los iconos y logos////////////////////////////////
 //// 'icon_1', 16x16px
 const unsigned char epd_bitmap_icon_1 [] PROGMEM = { //gladiolo
@@ -80,12 +130,14 @@ const int NUM_ITEMS = 4; // numero de items
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name
 
 char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // arreglo con los nombres
-  { "Tomaco" }, 
+  { "Tomate" }, 
   { "datos" },
   { "Gladiolo" },
   { "Reset cult" } 
   
 };
+
+
 
 #define BUTTON_UP_PIN 12 // pin for UP button 
 #define BUTTON_SELECT_PIN 8 // pin for SELECT button
@@ -96,8 +148,6 @@ char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // arreglo con los nombres
 #define flora 3
 #define DEMO_PIN 2 // pin para modo directo
 #define lampara 5
-
-
 
 int button_up_clicked = 0; // only perform action when button is clicked, and wait until another press
 int button_select_clicked = 0; // same as above
@@ -115,7 +165,17 @@ int demo_mode_delay = 0; // retraso del modo de demostración = utilizado para r
 
 
 
+
 void setup() {
+//////////////************///////////////////********  
+ Wire.begin();                               
+  rtc.begin();
+  //rtc.setDateTime(fecha) ;
+  ///////////*****************//////////////********************
+  
+  
+  
+  
   
   // define pins for buttons
   // INPUT_PULLUP means the button is HIGH when not pressed, and LOW when pressed
@@ -127,6 +187,22 @@ void setup() {
   pinMode(7, INPUT_PULLUP);
   pinMode(lampara, OUTPUT);
  
+ 
+ 
+ 
+ 
+ 
+ ///////////////*************////////////////////*************
+ 
+ dia_inicio=String(dia_inicio1, DEC);
+ mes_inicia=String(mes_inicia1, DEC);
+ dia_termina=String(dia_termina1, DEC);
+ mes_termina=String(mes_termina1, DEC);
+ dia_inicia_flora=String(dia_inicia_flora1, DEC);
+ mes_inicia_flora=String(mes_termina_flora1, DEC);
+ 
+ ////////////****************////////////////////*********************
+
 }
   
 void configuracionOled(void) {
@@ -138,6 +214,27 @@ void configuracionOled(void) {
 
 void loop() {
 
+ DateTime now = rtc.now();
+ //rtc.convertTemperature();
+
+ //temp=rtc.getTemperature();
+ tiempo=millis()/1000;
+ //temperatura=String(temp, DEC);
+ ano=String(now.year(), DEC);
+ mes=String(now.month(), DEC);
+ dia=String(now.date(), DEC);
+ segundos=String(now.second(), DEC);
+ minuto=String(now.minute(), DEC);
+ hora=String(now.hour(), DEC);
+
+  segundo1=now.second();
+  minuto1=now.minute();
+  hora1=now.hour();
+  dia1=now.date();
+  mes1 =now.month();
+  
+  
+  
   if (digitalRead(DEMO_PIN) == LOW) {  ///si esta en 0
   demo_mode = 1; // enable demo mode  
   }
@@ -194,3 +291,149 @@ void loop() {
  u8g.firstPage(); // required for page drawing mode for u8g library
  
  
+ 
+  do {
+   //////////////////se encarga de dibujar el menú  ////////////////////////////////////
+   if (current_screen == 0) { // MENU SCREEN
+     // coloca la barr de seleccion
+   u8g.drawBitmapP(0, 22, 128/8, 21, bitmap_item_sel_outline);
+
+   // dibujar elemento anterior como icono + etiqueta
+   u8g.setFont(u8g_font_7x14);
+   u8g.drawStr(25, 15, menu_items[item_sel_previous]); 
+   u8g.drawBitmapP( 4, 2, 16/8, 16, epd_bitmap_icons[item_sel_previous]);          
+
+   //dibujar el elemento seleccionado como icono + etiqueta en negrita
+   u8g.setFont(u8g_font_7x14B);    
+   u8g.drawStr(25, 15+20+2, menu_items[item_selected]);   
+   u8g.drawBitmapP( 4, 24, 16/8, 16, epd_bitmap_icons[item_selected]);     
+
+   // draw next item as icon + label
+   u8g.setFont(u8g_font_7x14);     
+   u8g.drawStr(25, 15+20+20+2+2, menu_items[item_sel_next]);   
+   u8g.drawBitmapP( 4, 46, 16/8, 16, epd_bitmap_icons[item_sel_next]);  
+
+   // dibujar el fondo de la barra de desplazamiento
+   u8g.drawBitmapP(128-8, 0, 8/8, 64, bitmap_scrollbar_background);
+
+   //dibuja el identificador de la barra de desplazamiento
+   u8g.drawBox(125, 64/NUM_ITEMS * item_selected, 3, 64/NUM_ITEMS); 
+   } 
+ 
+ 
+ 
+
+ //////////////////se encarga de la parte de las acciones del menu la segunda parte
+   else if (current_screen == 1) { // SCREENSHOTS SCREEN
+    switch(item_selected){
+  
+    case 1:  //datos
+     configuracionOled() ;
+     fechacor(temperatura,ano,mes,dia,hora,minuto,segundos);
+    break;
+  
+    case 2:///////////////////// este caso se encarga del modo automatico cuando lo encendemos///////////////////////////////////////////////////
+
+    break;
+   
+    case 3:// este caso se encarga de fijar los dos parametros iniciales
+ 
+    break;
+   
+    case 0:
+
+    break; 
+    }  
+   } 
+
+ //////////////////////////////////Para la tercera parte del menu o la parte ue nos avisa que salimos
+ 
+   else if(current_screen == 2){  
+   switch(item_selected){
+   case 1:
+   configuracionOled() ;
+   u8g.drawStr(0,22,"saliendo case1");
+   apagar_lampara();
+   break;
+   
+   case 2:
+   configuracionOled() ;
+   u8g.drawStr(0,22,"saliendo case2");
+   break; 
+   
+   case 3:// este caso se encarga del modo resetear datos
+   configuracionOled() ;
+   u8g.drawStr(0,22,"saliendo case3");
+  
+   break;
+       
+   case 0:
+   u8g.drawStr(0,22,"SaliendoR");
+   break; 
+   } 
+   }
+  }
+  while(u8g.nextPage());
+}
+
+//////////////////////////////////////// apaga la lampara //////////////////////////////
+void apagar_lampara(){
+ digitalWrite(lampara, LOW);     
+ delay(500); 
+ u8g.firstPage(); // required for page drawing mode for u8g library
+ do {
+ //configuracionOled();
+ u8g.drawStr(2,0,"Lampara apagada");
+ u8g.drawStr(2,24,"!!NO MOLESTAR!!");
+ }while(u8g.nextPage());
+ delay(4000);
+
+}
+
+//////////////////esta la utilizo para encender el tiempo de 18 horas (automaticas o vegeta)////////////////////
+void activar_lampara(){    
+  digitalWrite(lampara, HIGH); 
+  delay(500);
+   
+  configuracionOled();
+  u8g.firstPage(); // required for page drawing mode for u8g library
+  do {
+  u8g.drawStr(2,0,"Lampara");
+  u8g.setScale2x2();
+  u8g.drawStr(2,10,"prendida");
+  u8g.undoScale();
+  }while(u8g.nextPage());
+  delay(500);
+  
+}
+
+void datitos(String dia_inicio, String mes_inicio, String dia_termina,String mes_termina,String dia_inicia_flora,String mes_inicia_flora ){
+
+ //convertidor();
+ 
+ datosc = "Cultivo iniciado:  " + dia_inicio+"/"+ mes_inicio;
+ datosc1 = "Cultivo finaliza:  "+ dia_termina+"/"+ mes_termina;
+ datosc2 = "Comienza flora:  "+ dia_inicia_flora+"/"+ mes_inicia_flora;
+  
+ 
+  const char* nuevosdatos=(const char*)datosc.c_str(); 
+  const char* nuevosdatos1=(const char*)datosc1.c_str(); 
+  const char* nuevosdatos2=(const char*)datosc2.c_str();
+  
+  u8g.drawStr(0,0,nuevosdatos);
+  u8g.drawStr(0,40,nuevosdatos1);
+  u8g.drawStr(0,20,nuevosdatos2);
+  
+}
+
+void fechacor(String temperatura,String ano,String mes,String dia,String hora,String minuto,String segundos ){
+ fechac = "T: "+temperatura+"C      F: "+dia+"/"+mes+"/"+ano;
+ horac ="hora:  " +hora+":"+minuto+":"+segundos;
+ const char* nuevafecha=(const char*)fechac.c_str();
+ const char* nuevahora=(const char*)horac.c_str();
+ 
+ 
+ u8g.drawStr(2,24,nuevafecha);
+ u8g.drawStr(2,2,"fecha de hoy");// 
+ u8g.drawStr(2,44,nuevahora);
+}
