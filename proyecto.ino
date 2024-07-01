@@ -1,7 +1,7 @@
 #include <Sodaq_DS3231.h>
 #include <Wire.h> 
 #include "U8glib.h"
-
+#include <EEPROM.h>
 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
 
@@ -15,12 +15,19 @@ String datosc="";
 String datosc1="";
 String datosc2="";
 
-//Para la convercion a string ///////////////////////////////////////////////
+//Para la convercion a string ///
+
 
 int dia_inicio1 =15 ;         
 int mes_inicia1=6;
 
 int dia_termina1 =dia_inicio1 ;       
+
+int dia_inicio1 =10 ; //EEPROM.read(1);      
+int mes_inicia1=6;
+
+int dia_termina1 = 5;  //EEPROM.read(0) ;       
+>>>>>>> david_branch
 int mes_termina1= mes_inicia1+2;
 
 int dia_inicia_flora1= dia_inicio1;
@@ -52,7 +59,7 @@ int mes_c2 = mes_inicia_flora1; //mes
 int mest_c2= mes_termina_flora1; //mes
 
 int dia_c2=dia_inicia_flora1; //dia
-int diat_c2=dia_termina_flora1;
+ int diat_c2=dia_termina_flora1;
 
 int m1_c3=0;   
 int s1_c3=0; 
@@ -70,16 +77,6 @@ int h1a_c2=10;
 
 int m1_c2=0;
 int s1_c2=0;
-
-
-
-
-
-
-
-//////////////*****************/////////////////////*******************//////
-
-
 
 
 /////////////////////////////////////////////////para el menu los iconos y logos////////////////////////////////
@@ -341,12 +338,56 @@ void loop() {
     fechacor(temperatura,ano,mes,dia,hora,minuto,segundos);
     break;
   
+
     case 2:///////////////////// este caso se encarga del modo automatico cuando lo encendemos///////////////////////////////////////////////////
+    case 2:  //gladiolo
+
     Gladiolo() ;
     break;
    
     case 3:// este caso se encarga de fijar los dos parametros iniciales
+
  
+
+    if(digitalRead(7)==0) {
+    u8g.firstPage(); // required for page drawing mode for u8g library
+    configuracionOled();
+    do { 
+    u8g.drawStr(0,22,"Almacenando los 2 datos:");  // avisar q vamos a almacenar datos
+    }while(u8g.nextPage());
+    delay (3000);     
+
+    int dia_inicio1 = now.date();
+    int mes_inicia1 = now.month();     
+  
+    EEPROM.write(0, dia_inicio1);           // Escribe datos de la memoria EEPROM
+    delay (500);
+    EEPROM.write(1, mes_inicia1);  
+    delay (500);
+  
+    u8g.firstPage(); // required for page drawing mode for u8g library
+    configuracionOled();
+    do { 
+    u8g.drawStr(0,22,"Apagar interrupotor 2");  // asegurarse de no grabar muchas veces en la memoria eprom
+    }while(u8g.nextPage());
+    delay (5000);     
+  
+    u8g.firstPage(); // comprobar
+    configuracionOled();
+    do {
+    u8g.drawStr(0,22,"datos guardados"); 
+    }while(u8g.nextPage());
+    delay (2000);
+    }
+  
+    else {
+    u8g.firstPage(); // required for page drawing mode for u8g library
+    configuracionOled();
+    do {
+    u8g.drawStr(0,22,"datos guardados"); 
+    }while(u8g.nextPage());
+    //delay (3000);
+    }
     break;
    
     case 0:
@@ -360,9 +401,14 @@ void loop() {
    else if(current_screen == 2){  
    switch(item_selected){
    case 1:
+
    configuracionOled() ;
    u8g.drawStr(0,22,"saliendo case1");
    apagar_lampara();
+
+   //configuracionOled() ;
+   datitos(dia_inicio, mes_inicia, dia_termina, mes_termina, dia_inicia_flora, mes_inicia_flora);
+
    break;
    
    case 2:
@@ -713,8 +759,7 @@ void fn_ini_ciclo(){
    }while(u8g.nextPage());
    delay(4000);
     activar_lampara();
-    
-   
+ 
   } 
 
    while ((mes1==mest_c2) && (dia1>=diat_c2) && (hora1<=h1a_c2)){
