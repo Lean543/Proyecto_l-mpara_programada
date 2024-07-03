@@ -15,6 +15,7 @@ String datosc="";
 String datosc1="";
 String datosc2="";
 
+
 //Para la convercion a string ///
 
 
@@ -28,6 +29,14 @@ int mes_inicia1=6;
 
 int dia_termina1 = 5;  //EEPROM.read(0) ;       
 >>>>>>> david_branch
+=======
+//Para la convercion a string ///////////////////////////////////////////////
+
+int dia_inicio1 =1 ;   //EEPROM.read(0) ;     
+int mes_inicia1=7;     //EEPROM.read(1);
+
+int dia_termina1 = 5;        
+>>>>>>> shey_branch
 int mes_termina1= mes_inicia1+2;
 
 int dia_inicia_flora1= dia_inicio1;
@@ -59,7 +68,7 @@ int mes_c2 = mes_inicia_flora1; //mes
 int mest_c2= mes_termina_flora1; //mes
 
 int dia_c2=dia_inicia_flora1; //dia
- int diat_c2=dia_termina_flora1;
+int diat_c2=dia_termina_flora1;
 
 int m1_c3=0;   
 int s1_c3=0; 
@@ -78,8 +87,7 @@ int h1a_c2=10;
 int m1_c2=0;
 int s1_c2=0;
 
-
-/////////////////////////////////////////////////para el menu los iconos y logos////////////////////////////////
+//////////////////////////////para el menú los iconos y logos////////////////////////////////
 //// 'icon_1', 16x16px
 const unsigned char epd_bitmap_icon_1 [] PROGMEM = { //gladiolo
 	0x00, 0x00, 0x00, 0x00, 0x07, 0xe0, 0x0e, 0x70, 0x0e, 0x70, 0x0e, 0x70, 0x0e, 0x70, 0x0e, 0x70, 
@@ -142,12 +150,7 @@ const unsigned char bitmap_item_sel_outline [] PROGMEM = {
   0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xe0, 
   0x1f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0
 };
-
-
-
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
-
-
 
 const int NUM_ITEMS = 4; // numero de items
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name
@@ -159,8 +162,6 @@ char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // arreglo con los nombres
   { "Reset cult" } 
   
 };
-
-
 
 #define BUTTON_UP_PIN 12 // pin for UP button 
 #define BUTTON_SELECT_PIN 8 // pin for SELECT button
@@ -186,9 +187,6 @@ int demo_mode = 0; // when demo mode is set to 1, it automatically goes over all
 int demo_mode_state = 0; //  que pantalla eh item mostrar al principio
 int demo_mode_delay = 0; // retraso del modo de demostración = utilizado para ralentizar el cambio de pantalla
 
-
-
-
 void setup() {
 
   Wire.begin();                               
@@ -212,12 +210,6 @@ void setup() {
  
 }
   
-void configuracionOled(void) {
-  u8g.setFont(u8g_font_ncenB08);
-  u8g.setFontRefHeightExtendedText();
-  u8g.setDefaultForegroundColor();
-  u8g.setFontPosTop();    
-}
 
 void loop() {
 
@@ -295,11 +287,8 @@ void loop() {
  item_sel_next = item_selected + 1;  
  if (item_sel_next >= NUM_ITEMS) {item_sel_next = 0;} // next item would be after last = make it the first
  u8g.firstPage(); // required for page drawing mode for u8g library
- 
- 
- 
-  do {
-   //////////////////se encarga de dibujar el menú  ////////////////////////////////////
+ //////////////////se encarga de dibujar el menú  ///////////////////////////////////
+ do {
    if (current_screen == 0) { // MENU SCREEN
      // coloca la barr de seleccion
    u8g.drawBitmapP(0, 22, 128/8, 21, bitmap_item_sel_outline);
@@ -326,34 +315,26 @@ void loop() {
    u8g.drawBox(125, 64/NUM_ITEMS * item_selected, 3, 64/NUM_ITEMS); 
    } 
  
- 
- 
-
  //////////////////se encarga de la parte de las acciones del menu la segunda parte
-   else if (current_screen == 1) { // SCREENSHOTS SCREEN
+ else if (current_screen == 1) { // SCREENSHOTS SCREEN
     switch(item_selected){
-  
     case 1:  //datos
     configuracionOled() ;
     fechacor(temperatura,ano,mes,dia,hora,minuto,segundos);
     break;
-  
-
-    case 2:///////////////////// este caso se encarga del modo automatico cuando lo encendemos///////////////////////////////////////////////////
+    
     case 2:  //gladiolo
-
+    if(digitalRead(8)==1){
     Gladiolo() ;
+    }
     break;
-   
-    case 3:// este caso se encarga de fijar los dos parametros iniciales
-
- 
-
+    
+    case 3:    //este caso se encarga de fijar los dos parametros iniciales
     if(digitalRead(7)==0) {
     u8g.firstPage(); // required for page drawing mode for u8g library
     configuracionOled();
     do { 
-    u8g.drawStr(0,22,"Almacenando los 2 datos:");  // avisar q vamos a almacenar datos
+    u8g.drawStr(0,22,"Almacenando los datos:");  // avisar q vamos a almacenar datos
     }while(u8g.nextPage());
     delay (3000);     
 
@@ -390,40 +371,36 @@ void loop() {
     }
     break;
    
-    case 0:
-
+    case 0:  ///tomate
+    if(digitalRead(8)==1){
+    tomate() ;
+    }
     break; 
-    }  
-   } 
+  }  
+} 
 
- //////////////////////////////////Para la tercera parte del menu o la parte ue nos avisa que salimos
  
-   else if(current_screen == 2){  
+ ////////////////Para la tercera parte del menú, la parte que nos avisa que salimos
+ else if(current_screen == 2){  
    switch(item_selected){
-   case 1:
-
-   configuracionOled() ;
-   u8g.drawStr(0,22,"saliendo case1");
-   apagar_lampara();
-
+   case 1: //Datos
    //configuracionOled() ;
    datitos(dia_inicio, mes_inicia, dia_termina, mes_termina, dia_inicia_flora, mes_inicia_flora);
-
    break;
    
    case 2:
-   configuracionOled() ;
-   u8g.drawStr(0,22,"saliendo case2");
+   //configuracionOled() ;
+   u8g.drawStr(0,22,"saliendo al menu");
    break; 
    
-   case 3:// este caso se encarga del modo resetear datos
+   case 3: //este caso se encarga del modo reset datos
    configuracionOled() ;
-   u8g.drawStr(0,22,"saliendo case3");
+   u8g.drawStr(0,22,"Listo salir");
   
    break;
        
-   case 0:
-   u8g.drawStr(0,22,"SaliendoR");
+   case 0:  //tomate
+   u8g.drawStr(0,22,"saliendo al menu");
    break; 
    } 
    }
@@ -431,6 +408,13 @@ void loop() {
   while(u8g.nextPage());
 }
 
+
+void configuracionOled(void) {
+  u8g.setFont(u8g_font_ncenB08);
+  u8g.setFontRefHeightExtendedText();
+  u8g.setDefaultForegroundColor();
+  u8g.setFontPosTop();    
+}
 //////////////////////////////////////// apaga la lampara //////////////////////////////
 void apagar_lampara(){
  digitalWrite(lampara, LOW);     
@@ -444,7 +428,6 @@ void apagar_lampara(){
  delay(4000);
 
 }
-
 //////////////////esta la utilizo para encender el tiempo de 18 horas (automaticas o vegeta)////////////////////
 void activar_lampara(){    
   digitalWrite(lampara, HIGH); 
@@ -461,14 +444,43 @@ void activar_lampara(){
   delay(1500);
   
 }
-//////////////////////////////////////////////////////////////////////////////
+/////los datos horario los utilizo para mostrar la info de cada mes////////
+void datoshorario(){      //configuracionOled();
+  u8g.firstPage(); // required for page drawing mode for u8g library
+  do { 
+  u8g.drawStr(2,0,"Horario nocturno");
+  u8g.drawStr(2,24,"de encendido");
+  u8g.drawStr(2,44,"mes 1");
+  }while(u8g.nextPage());
+  delay(2000);
+}
+ 
+void datoshorario2(){ 
+  u8g.firstPage(); // required for page drawing mode for u8g library
+  do {
+  u8g.drawStr(2,0,"Horario diurno");
+  u8g.drawStr(2,24,"de encendido");
+  u8g.drawStr(2,44,"mes 2");
+  }while(u8g.nextPage());
+  delay(2000);
+}
+
+void datoshorario3(){ 
+  u8g.firstPage(); // required for page drawing mode for u8g library
+  do {
+  u8g.drawStr(2,0,"Horario diurno");
+  u8g.drawStr(2,24,"de encendido");
+  u8g.drawStr(2,44,"mes 3");
+  }while(u8g.nextPage());
+  delay(2000);
+}
+
+///////////////////////////mostrar datos del cultivo///////////////////////////////////////////////////
 void datitos(String dia_inicio, String mes_inicio, String dia_termina,String mes_termina,String dia_inicia_flora,String mes_inicia_flora ){
 
- //convertidor();
- 
  datosc = "Cultivo iniciado:  " + dia_inicio+"/"+ mes_inicio;
- datosc1 = "Cultivo finaliza:  "+ dia_termina+"/"+ mes_termina;
- datosc2 = "Comienza flora:  "+ dia_inicia_flora+"/"+ mes_inicia_flora;
+ datosc1 = "Comienza flora:  "+ dia_termina+"/"+ mes_termina;
+ datosc2 = "Cultivo finaliza: "+ dia_inicia_flora+"/"+ mes_inicia_flora;
   
  
   const char* nuevosdatos=(const char*)datosc.c_str(); 
@@ -480,7 +492,7 @@ void datitos(String dia_inicio, String mes_inicio, String dia_termina,String mes
   u8g.drawStr(0,20,nuevosdatos2);
   
 }
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////mostrar datos del rtc///////////////////////////////////////////////////////////
 void fechacor(String temperatura,String ano,String mes,String dia,String hora,String minuto,String segundos ){
  fechac = "T: "+temperatura+"C      F: "+dia+"/"+mes+"/"+ano;
  horac ="hora:  " +hora+":"+minuto+":"+segundos;
@@ -492,7 +504,7 @@ void fechacor(String temperatura,String ano,String mes,String dia,String hora,St
  u8g.drawStr(2,2,"fecha de hoy");// 
  u8g.drawStr(2,44,nuevahora);
 }
-///////////////////////////////////////////////////////////////////////////////
+//////////////lógica para prender y apagar la lampara/////////////////////////////////////////////////////////////////
 void Gladiolo(){ 
 
  DateTime now = rtc.now();
@@ -506,284 +518,121 @@ void Gladiolo(){
   u8g.undoScale();
   
   }while(u8g.nextPage());
-  delay(4000);
-  //convertidor();
+  delay(2000);
   
-  if ((hora1<h1a_c3) && (mes1==mes_c3) && (dia1>=dia_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
-     
-   u8g.firstPage(); // required for page drawing mode for u8g library
-   do {
-   //configuracionOled();
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   u8g.drawStr(2,44,"mes 1");
-   }while(u8g.nextPage());
-   delay(4000);
+  
+ if ((hora1<h1a_c3) && (mes1==mes_c3) && (dia1>=dia_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
+   datoshorario();
    activar_lampara();
-    
-   }
-    
-   if ((mes1==mes_c3)&& (dia1>=dia_c3) &&(hora1>=h1_c3)){
-     
-    u8g.firstPage(); // required for page drawing mode for u8g library
-    do { 
-    //configuracionOled();
-    u8g.drawStr(2,0,"Horario nocturno");
-    u8g.drawStr(2,24,"de encendido");
-    u8g.drawStr(2,44,"mes 1");
-    }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-  
-   }
+  }
+
+ if ((mes1==mes_c3)&& (dia1>=dia_c3) &&(hora1>=h1_c3)){
+   datoshorario();
+   activar_lampara();
+  }
  
   
-   //estos tres segundos son para el segundo mes
-   M = mes_inicia1+1;
-   
-   
-   if ((mes1==M) && (hora1<h1a_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
-   //configuracionOled();
-    u8g.firstPage(); // required for page drawing mode for u8g library
-    do {
-    u8g.drawStr(2,0,"Horario diurno");
-    u8g.drawStr(2,24,"de encendido");
-    u8g.drawStr(2,44,"mes 2");
-    }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-  
-    
-  }
-   if ((mes1==M) && (hora1>=h1_c3)){
-    //configuracionOled();
-    u8g.firstPage(); // required for page drawing mode for u8g library
-    do {
-    u8g.drawStr(2,0,"Horario nocturno");
-    u8g.drawStr(2,24,"de encendido");
-    u8g.drawStr(2,44,"mes 2");
-    }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-    }
-   //estos tres ultimos son para el ultimo mes de vegeta
+  //estos tres segundos son para el segundo mes
+  M = mes_inicia1+1;
 
-    if ((mes1==mest_c3) && (dia1<=diat_c3) && (hora1<h1a_c3) ){
-    
-    u8g.firstPage(); // required for page drawing mode for u8g library
-    do {
-    //configuracionOled();
-    u8g.drawStr(2,0,"Horario diurno");
-    u8g.drawStr(2,24,"de encendido");
-    u8g.drawStr(2,44,"mes 3");
-    }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-   }
    
-   
-   if ((mes1==mest_c3) && (dia1<=diat_c3)&& (hora1>=h1_c3)){
-    
-    u8g.firstPage(); // required for page drawing mode for u8g library
-    do {
-    //configuracionOled();
-    u8g.drawStr(2,0,"Horario nocturno");
-    u8g.drawStr(2,24,"de encendido");
-    u8g.drawStr(2,44,"mes 3");
-    }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-    
-   
-    } 
+  if ((mes1==M) && (hora1<h1a_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
+   datoshorario2();
+   activar_lampara();
+  }
   
-   if ((hora1>=h1a_c3) && (hora1<h1_c3) ){ 
-    apagar_lampara();
-    u8g.firstPage();
+  if ((mes1==M) && (hora1>=h1_c3)){
+   datoshorario2();
+   activar_lampara();
+  }
+  //estos tres ultimos son para el ultimo mes de vegeta
+
+  if ((mes1==mest_c3) && (dia1<=diat_c3) && (hora1<h1a_c3) ){
+   
+   datoshorario3();
+   activar_lampara();
+  }
+   
+   
+  if ((mes1==mest_c3) && (dia1<=diat_c3)&& (hora1>=h1_c3)){
+   datoshorario3();
+   activar_lampara();
+  } 
+  
+  if ((hora1>=h1a_c3) && (hora1<h1_c3) ){ 
+   apagar_lampara();
+   u8g.firstPage();
     do {
-    u8g.drawStr(2,0,"se apago");
-    u8g.drawStr(2,24,"madafoca");
+    u8g.drawStr(2,0,"Lampara");
+    u8g.drawStr(2,24,"Apagada");
     }while(u8g.nextPage());
     delay(4000); 
-   } 
+  } 
 
 }
  
-
-
-
-void fn_ini_ciclo(){
-  DateTime now = rtc.now(); 
-  delay(200); 
-  configuracionOled();
-   u8g.firstPage(); 
-  do {
-  u8g.drawStr(2,0,"Lampara modo");
+void tomate(){
+  DateTime now = rtc.now();
+ u8g.firstPage(); // required for page drawing mode for u8g library
+ configuracionOled();
+ do { 
+  //configuracionOled();
+  u8g.drawStr(2,0,"Cutivando");
   u8g.setScale2x2();
-  u8g.drawStr(2,10,"regulares");
+  u8g.drawStr(2,10,"Tomate");
   u8g.undoScale();
+  
   }while(u8g.nextPage());
-  delay(3000);
+  delay(2000);
   
-   //estos tres primero son para el primer mes de vegeta
- while ((hora1<h1a_c3) && (mes1==mes_c3) && (dia1>=dia_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
-  configuracionOled();
-  u8g.firstPage(); 
-  do {
-  u8g.drawStr(2,0,"Horario diurno");
-  u8g.drawStr(2,20,"de encendido");
- u8g.drawStr(2,40,"mes 1");
-  }while(u8g.nextPage());
-  delay(4000);
-  activar_lampara();
+  
+ if ((hora1<h1a_c3) && (mes1==mes_c3) && (dia1>=dia_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
+   datoshorario();
+   activar_lampara();
   }
-   
-   while ((mes1==mes_c3)&& (dia1>=dia_c3) &&(hora1>=h1_c3)){
-     //configuracionOled();
-     u8g.firstPage(); // required for page drawing mode for u8g library
-     do { 
-     u8g.drawStr(2,0,"Horario nocturno");
-     u8g.drawStr(2,20,"de encendido");
-     u8g.drawStr(2,40,"mes 1");
-      }while(u8g.nextPage());
-     delay(4000);
-     activar_lampara();
-  
-   }
-   //apagar_lampara();
-  
-  /// do {
-  // u8g.drawStr(2,0,"Plantas durmiendo");
-  // u8g.drawStr(2,24,"sleep");
- //}while(u8g.nextPage());
-  // delay(4000);
-  
-   //estos tres segundos son para el segundo mes
-  
-   M = mes_inicia1+1;
-   
-   
-   while ((mes1==M) && (hora1<h1a_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
-       u8g.firstPage(); 
-      do {
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   u8g.drawStr(2,40,"mes 2");
-   }while(u8g.nextPage());
-   delay(4000);
-   activar_lampara();
-   
-   }
-   
-   while ((mes1==M) && (hora1>=h1_c3)){
-      u8g.firstPage(); 
-     do {
-   u8g.drawStr(2,0,"Horario nocturno");
-   u8g.drawStr(2,24,"de encendido");
-   u8g.drawStr(2,40,"mes 2");
-   }while(u8g.nextPage());
-   delay(4000);
-   activar_lampara();
-  
-  
-   }
-     
-   //estos tres ultimos son para el ultimo mes de vegeta
-   while ((mes1==mest_c3) && (dia1<=diat_c3) && (hora1<h1a_c3) ){
-      u8g.firstPage(); 
-     do {
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-    
-   }
-   
-   while ((mes1==mest_c3) && (dia1<=diat_c3)&& (hora1>=h1_c3)){
-   u8g.firstPage(); 
-   do {
-   u8g.drawStr(2,0,"Horario nocturno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-   activar_lampara();
-  
-   }
-   apagar_lampara();
-   
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /////////////////////////////////////////////estos dos primero son para el primer mes de floracion///////////////////////////////////////
-   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   while ((mes1==mest_c3) && (dia1>=diat_c3) && (hora1<=h1a_c2)){
-     u8g.firstPage(); 
-   do {
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-   delay(4000);
-   activar_lampara();
-   
-   }
-   
-   while ((mes1==mest_c3) && (dia1>=diat_c3) && (hora1>h1_c2)){
-    u8g.firstPage(); 
-   do {
-   u8g.drawStr(2,0,"Horario nocturno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-   delay(4000);
-   activar_lampara();
-   
-  
 
-  
-  }  
-
-   M2=mes_termina1+1;
-   while ((mes1==M2) && (hora1<=h1a_c2)){
-   u8g.firstPage(); 
-   do {
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-  
-    
+ if ((mes1==mes_c3)&& (dia1>=dia_c3) &&(hora1>=h1_c3)){
+   datoshorario();
+   activar_lampara();
   }
-   while ((mes1==M2) && (hora1>h1_c2)){
-   u8g.firstPage(); 
-    do {
-   u8g.drawStr(2,0,"Horario nocturno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-   delay(4000);
-    activar_lampara();
  
-  } 
+  
+  //estos tres segundos son para el segundo mes
+  M = mes_inicia1+1;
 
-   while ((mes1==mest_c2) && (dia1>=diat_c2) && (hora1<=h1a_c2)){
-      u8g.firstPage(); 
-     do {
-   u8g.drawStr(2,0,"Horario diurno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-
-    
-  }
-   while ((mes1==mest_c2) && (dia1<=diat_c2) && (hora1>h1_c2)){
-      u8g.firstPage(); 
-     do {
-   u8g.drawStr(2,0,"Horario nocturno");
-   u8g.drawStr(2,24,"de encendido");
-   }while(u8g.nextPage());
-    delay(4000);
-    activar_lampara();
-    
    
-    
+  if ((mes1==M) && (hora1<h1a_c3) ){   //h1a_c3 es hora de apagado del modo automaticas
+   datoshorario2();
+   activar_lampara();
+  }
+  
+  if ((mes1==M) && (hora1>=h1_c3)){
+   datoshorario2();
+   activar_lampara();
+  }
+  //estos tres ultimos son para el ultimo mes de vegeta
+
+  if ((mes1==mest_c3) && (dia1<=diat_c3) && (hora1<h1a_c3) ){
+   
+   datoshorario3();
+   activar_lampara();
+  }
+   
+   
+  if ((mes1==mest_c3) && (dia1<=diat_c3)&& (hora1>=h1_c3)){
+   datoshorario3();
+   activar_lampara();
+  } 
+  
+  if ((hora1>=h1a_c3) && (hora1<h1_c3) ){ 
+   apagar_lampara();
+   u8g.firstPage();
+    do {
+    u8g.drawStr(2,0,"Lampara");
+    u8g.drawStr(2,24,"Apagada");
+    }while(u8g.nextPage());
+    delay(4000); 
   } 
     
 }
+
